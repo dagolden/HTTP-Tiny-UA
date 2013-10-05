@@ -6,7 +6,7 @@ package HTTP::Tiny::UA::Response;
 # ABSTRACT: Wrap HTTP::Tiny response as objects with accessors
 # VERSION
 
-use Class::Tiny qw( success url status reason content headers );
+use Class::Tiny qw( success url status reason content headers protocol );
 
 =attr success
 
