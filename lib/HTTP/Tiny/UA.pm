@@ -10,12 +10,18 @@ use superclass 'HTTP::Tiny' => 0.036;
 
 use HTTP::Tiny::UA::Response;
 
+=method new|get|head|put|post|delete|post_form|mirror
+
+These methods are inherited from L<HTTP::Tiny> and work the same way.
+
 =method request
 
     my $res = HTTP::Tiny->new->get( $url );
 
-Just like L<HTTP::Tiny::response|HTTP::Tiny/response>, but returns
-a L<HTTP::Tiny::UA::Reponse object>.
+Just like L<HTTP::Tiny::request|HTTP::Tiny/request>, but returns a
+L<HTTP::Tiny::UA::Reponse> object.  Since all other C<get>, C<post>, etc.
+methods eventually invoke this one so all methods will return response object
+now.
 
 =cut
 
@@ -41,7 +47,7 @@ sub request {
 
 This module extends L<HTTP::Tiny> with higher-level convenience features.
 
-=head2 CONTRIBUTING
+=head1 CONTRIBUTING
 
 Unlike L<HTTP::Tiny>, this module is open to additional features.  Please
 discuss new ideas on the bug tracker for feedback before implementing.
