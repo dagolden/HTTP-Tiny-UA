@@ -8,6 +8,23 @@ package HTTP::Tiny::UA;
 
 use superclass 'HTTP::Tiny' => 0.036;
 
+use HTTP::Tiny::UA::Response;
+
+=method request
+
+    my $res = HTTP::Tiny->new->get( $url );
+
+Just like L<HTTP::Tiny::response|HTTP::Tiny/response>, but returns
+a L<HTTP::Tiny::UA::Reponse object>.
+
+=cut
+
+sub request {
+    my ( $self, @args ) = @_;
+    my $res = $self->SUPER::request(@args);
+    return HTTP::Tiny::UA::Response->new($res);
+}
+
 1;
 
 =for Pod::Coverage BUILD
