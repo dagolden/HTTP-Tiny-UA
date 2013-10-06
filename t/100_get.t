@@ -79,6 +79,11 @@ for my $file ( dir_list( "t/cases", qr/^get/ ) ) {
     }
 
     is( $response->url, $url, "$label response URL" );
+    is(
+        $response->header("Content-Length"),
+        $response->{headers}{'content-length'},
+        "$label response Content-Length"
+    );
 
     if ( defined $case->{expected_headers} ) {
         my %expected = hashify( $case->{expected_headers} );
