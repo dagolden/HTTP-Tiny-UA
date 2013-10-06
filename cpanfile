@@ -6,6 +6,7 @@ requires "superclass" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
+  requires "Data::Dumper" => "0";
   requires "Exporter" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Basename" => "0";
@@ -15,6 +16,7 @@ on 'test' => sub {
   requires "IO::Dir" => "0";
   requires "IO::File" => "0";
   requires "IO::Handle" => "0";
+  requires "IO::Socket::INET" => "0";
   requires "IPC::Open3" => "0";
   requires "List::Util" => "0";
   requires "Test::More" => "0.88";

@@ -12,6 +12,8 @@ use Class::Tiny qw( success url status reason content headers protocol );
 
 =attr url
 
+=attr protocol
+
 =attr status
 
 =attr reason
