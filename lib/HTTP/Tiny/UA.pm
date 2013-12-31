@@ -57,7 +57,7 @@ L<HTTP::Tiny::UA::Response> object.
     my $res = HTTP::Tiny->new->get( $url );
 
 Just like L<HTTP::Tiny::request|HTTP::Tiny/request>, but returns a
-L<HTTP::Tiny::UA::Reponse> object.  All other C<get>, C<post>, etc. methods
+L<HTTP::Tiny::UA::Response> object.  All other C<get>, C<post>, etc. methods
 eventually invoke this one so all such methods return response objects now.
 
 =cut
