@@ -7,6 +7,8 @@ use File::Basename;
 use IO::File qw(SEEK_SET SEEK_END);
 use IO::Dir;
 use Test::More;
+use CPAN::Meta::YAML;
+use Test::Differences;
 
 BEGIN {
     our @EXPORT_OK = qw(
@@ -103,6 +105,15 @@ sub parse_case {
     return \%args;
 }
 
+sub parse_formdata {
+    my $yaml = shift
+      or return;
+    my $obj = eval { CPAN::Meta::YAML->read_string("---\n$yaml\n") }
+      or die CPAN::Meta::YAML->errstr;
+
+    return $obj->[0];
+}
+
 sub hashify {
     my ($lines) = @_;
     return unless $lines;
@@ -175,15 +186,17 @@ sub sort_headers {
 sub iterate_cases {
     my ( $ua_class, $dir, $selector ) = @_;
 
-    for my $file ( dir_list( "t/cases", qr/^get/ ) ) {
+    for my $file ( dir_list( $dir, $selector ) ) {
         my $label = basename($file);
         my $data = do { local ( @ARGV, $/ ) = $file; <> };
-        my ( $params, $expect_req, $give_res ) = split /--+\n/, $data;
+        my ( $params, $expect_req, $give_res, $yaml ) = split /^----+\n/m, $data;
         my $case = parse_case($params);
 
+        my $method   = $case->{method}[0] // 'get';
         my $url      = $case->{url}[0];
         my %headers  = hashify( $case->{headers} );
         my %new_args = hashify( $case->{new_args} );
+        my $formdata = parse_formdata($yaml);
 
         my %options;
         $options{headers} = \%headers if %headers;
@@ -210,8 +223,10 @@ sub iterate_cases {
 
         ( my $url_basename = $url ) =~ s{.*/}{};
 
-        my @call_args = %options ? ( $url, \%options ) : ($url);
-        my $response = $http->get(@call_args);
+        my @call_args = $url;
+        push @call_args, $formdata if $method eq 'post_multipart';
+        push @call_args, \%options if %options;
+        my $response = $http->$method(@call_args);
 
         my ( $got_host, $got_port ) = connect_args();
         my ( $exp_host, $exp_port ) =
@@ -221,9 +236,13 @@ sub iterate_cases {
 
         my $got_req = slurp($req_fh);
 
-        is( $got_host,              $exp_host,                 "$label host $exp_host" );
-        is( $got_port,              $exp_port,                 "$label port $exp_port" );
-        is( sort_headers($got_req), sort_headers($expect_req), "$label request data" );
+        is( $got_host, $exp_host, "$label host $exp_host" );
+        is( $got_port, $exp_port, "$label port $exp_port" );
+        eq_or_diff(
+            sort_headers($got_req),
+            sort_headers($expect_req),
+            "$label request data"
+        );
 
         my ($rc) = $give_res =~ m{\S+\s+(\d+)}g;
         # maybe override

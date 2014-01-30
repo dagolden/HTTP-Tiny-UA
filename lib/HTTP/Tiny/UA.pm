@@ -1,12 +1,17 @@
 use v5.10;
 use strict;
 use warnings;
+use utf8;
 
 package HTTP::Tiny::UA;
 # ABSTRACT: Higher-level UA features for HTTP::Tiny
 # VERSION
 
 use superclass 'HTTP::Tiny' => 0.036;
+use File::Basename;
+use Carp;
+use MIME::Base64;
+use Path::Tiny;
 
 use HTTP::Tiny::UA::Response;
 
@@ -66,6 +71,126 @@ sub request {
     my ( $self, @args ) = @_;
     my $res = $self->SUPER::request(@args);
     return HTTP::Tiny::UA::Response->new($res);
+}
+
+=method post_multipart
+
+    $response = $http->post_form($url, $form_data);
+    $response = $http->post_form($url, $form_data, \%options);
+
+=cut
+
+sub post_multipart {
+    my ( $self, $url, $data, $args ) = @_;
+
+    ( @_ == 3 || @_ == 4 && ref $args eq 'HASH' )
+      or Carp::croak( q/Usage: $http->post_multipart(URL, DATAREF, [HASHREF])/ . "\n" );
+
+    ( ref $data eq 'HASH' || ref $data eq 'ARRAY' )
+      or Carp::croak("form data must be a hash or array reference\n");
+
+    my @params = ref $data eq 'HASH' ? %$data : @$data;
+    @params % 2 == 0
+      or Carp::croak("form data reference must have an even number of terms\n");
+
+    my $headers = {};
+    while ( my ( $key, $value ) = each %{ $args->{headers} || {} } ) {
+        $headers->{ lc $key } = $value;
+    }
+
+    delete $args->{headers};
+
+    my $content_parts = _build_content( \@params );
+    my $boundary = _get_boundary( $headers, $content_parts );
+
+    my $last_boundary = $boundary;
+    substr $last_boundary, -2, 0, "--";
+
+    return $self->request(
+        'POST', $url,
+        {
+            %$args,
+            content => $boundary . join( $boundary, @{$content_parts} ) . $last_boundary,
+            headers => { %$headers, },
+        }
+    );
+}
+
+#--------------------------------------------------------------------------#
+# MIME by hand by Renee Bäcker
+#--------------------------------------------------------------------------#
+
+sub _get_boundary {
+    my ( $headers, $content ) = @_;
+
+    # Generate and check boundary
+    my $boundary;
+    my $size = 1;
+
+    while (1) {
+        $boundary = encode_base64 join( '', map chr( rand 256 ), 1 .. $size++ * 3 );
+        $boundary =~ s/\W/X/g;
+        last unless grep { $_ =~ m{$boundary} } @{$content};
+    }
+
+    # Add boundary to Content-Type header
+    ( $headers->{'content-type'} || '' ) =~ m!^(.*multipart/[^;]+)(.*)$!;
+
+    my $before = $1 || 'multipart/form-data';
+    my $after  = $2 || '';
+
+    $headers->{'content-type'} = "$before; boundary=\"$boundary$after\"";
+
+    return "--$boundary\x0d\x0a";
+}
+
+sub _build_term {
+    my ( $key, $value, $more_disposition, $more_headers ) = @_;
+    $more_disposition ||= [];
+    $more_headers     ||= [];
+
+    # Assemble content-disposition header
+    my $cd = "Content-Disposition: form-data; name=\"$key\"";
+    while (@$more_disposition) {
+        my ( $k, $v ) = splice @$more_disposition, 0, 2;
+        $cd .= "; $k=\"$v\"";
+    }
+
+    # Assemble rest of header
+    my @lines = $cd;
+    while (@$more_headers) {
+        my ( $k, $v ) = splice @$more_headers, 0, 2;
+        push @lines, "$k: $v";
+    }
+
+    return join( "\x0d\x0a", @lines ) . "\x0d\x0a\x0d\x0a$value\x0d\x0a";
+}
+
+sub _build_content {
+    my ($params) = @_;
+
+    my @terms;
+    while (@$params) {
+        my ( $key, $value ) = splice( @$params, 0, 2 );
+        # ARRAY indicates file upload
+        if ( ref $value eq 'ARRAY' ) {
+            my ( $path, $name, @headers ) = @$value;
+            $path = path($path);
+            my $content = $path->slurp_raw;
+            $content =~ s/\x0d?\x0a/\x0d\x0a/mg;
+            push @terms,
+              _build_term(
+                $key, $content,
+                [ 'filename',     $path->basename ],
+                [ 'Content-Type', 'text/plain' ]
+              );
+        }
+        else {
+            push @terms, _build_term( $key, $value );
+        }
+    }
+
+    return \@terms;
 }
 
 1;

@@ -1,0 +1,2 @@
+PATH=/local/perl/bin:$PATH
+export PATH

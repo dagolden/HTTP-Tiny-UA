@@ -1,0 +1,59 @@
+url
+  http://example.com/new
+content
+    name|Gisle Aas|email|gisle@aas.no|gender|M|born|1964|init|FILE
+file
+    t/data/profile
+method
+    post_multipart
+----------
+POST /new HTTP/1.1
+Host: example.com
+User-Agent: HTTP-Tiny/VERSION
+Content-Length: 417
+Content-Type: multipart/form-data; boundary="Oes0X"
+Connection: close
+
+--Oes0X
+Content-Disposition: form-data; name="name"
+
+Gisle Aas
+--Oes0X
+Content-Disposition: form-data; name="email"
+
+gisle@aas.no
+--Oes0X
+Content-Disposition: form-data; name="gender"
+
+M
+--Oes0X
+Content-Disposition: form-data; name="born"
+
+1964
+--Oes0X
+Content-Disposition: form-data; name="init"; filename="profile"
+Content-Type: text/plain
+
+PATH=/local/perl/bin:$PATH
+export PATH
+
+--Oes0X--
+
+----------
+HTTP/1.1 201 Created
+Date: Thu, 03 Feb 1994 00:00:00 GMT
+Location: http://example.com/new/01.txt
+Content-Length: 0
+
+----------
+- name
+- Gisle Aas
+- email
+- gisle@aas.no
+- gender
+- M
+- born
+- 1964
+- init
+-
+  - t/data/profile
