@@ -44,7 +44,7 @@ for my $file ( dir_list( "t/cases", qr/^get/ ) ) {
     my $res_fh = tmpfile($give_res);
     my $req_fh = tmpfile();
 
-    my $http = $UA_CLASS->new(%new_args);
+    my $http = $UA_CLASS->new( keep_alive => 0, %new_args );
     set_socket_source( $req_fh, $res_fh );
 
     ( my $url_basename = $url ) =~ s{.*/}{};
