@@ -84,6 +84,8 @@ sub content_type_params {
 
 =method decoded_content
 
+    ->decoded_content(\%opts);
+
 Returns L<< C<< ->content >>|/content >> after applying type specific decoding.
 
 At present, this means everything that is not C<text/*> will simply yield C<< ->content >>
@@ -92,25 +94,43 @@ And everything that is C<text/*> without a C<text/*;charset=someencoding> will s
 
     my $foo = $result->decoded_content(); # text/* with a specified encoding interpreted properly.
 
-Optionally, you can pass a forced encoding to apply and override smart detection.
+Optionally, you can pass a default encoding to apply if none is specified:  and override smart detection.
 
-    my $foo = $result->decoded_content('utf-8'); # type specific encodings ignored, utf-8 forced.
+    my $foo = $result->decoded_content({ encoding => 'utf-8' }); # utf8 assumed if none is specified
+
+And, you can force an encoding to apply to override smart detection.
+
+    my $foo = $result->decoded_content({ encoding => 'utf-8', force => 1 }); #  type specific encodings ignored, utf-8 forced.
+
+By default, decoding is I<best effort>, using C<Encoding::FB_DEFAULT> to handle unusual cases.
+
+This can be overridden:
+
+    my $foo = $result->decoded_content({ encoding => 'utf-8', force => 1, fallback => Encoding::FB_CROAK }); # Bad utf8 == die
 
 =cut
 
 sub decoded_content {
-    my ( $self, $force_encoding ) = @_;
-    if ( not $force_encoding ) {
-        return $self->content if not my $type = $self->content_type;
-        return $self->content unless $type =~ qr{ \Atext/ }msx;
+    my ( $self, $opts ) = @_;
+
+    $opts = {} unless $opts;
+
+    my $encoding = $opts->{encoding};
+
+    my $fallback = exists $opts->{fallback} ? $opts->{fallback} : Encode::FB_DEFAULT;
+
+    encodingsniff: {
+        last if $opts->{force};
+        last if not my $type = $self->content_type;
+        last unless $type =~ qr{ \Atext/ }msx;
         for my $param ( @{ $self->content_type_params } ) {
             if ( $param =~ qr{ \Acharset=(.+)\z }msx ) {
-                $force_encoding = $param;
+                $encoding = $1;
             }
         }
-        return $self->content if not $force_encoding;
     }
-    return Encode::decode( $force_encoding, $self->content, Encode::FB_CROAK );
+    return $self->content if not defined $encoding;
+    return Encode::decode( $encoding, $self->content, $fallback );
 }
 
 1;
