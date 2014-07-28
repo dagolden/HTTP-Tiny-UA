@@ -9,8 +9,8 @@ at release time (e.g. Makefile.PL).
 
 However, you can run tests directly using the 'prove' tool:
 
-  $ prove -l
-  $ prove -lv t/some_test_file.t
+    $ prove -l
+    $ prove -lv t/some_test_file.t
 
 For most distributions, 'prove' is entirely sufficent for you to test any
 patches you have.
@@ -20,8 +20,8 @@ file for a list.  If you install App::mymeta_requires from CPAN, it's easy
 to satisfy any that you are missing by piping the output to your favorite
 CPAN client:
 
-  $ mymeta-requires | cpanm
-  $ cpan `mymeta-requires`
+    $ mymeta-requires | cpanm
+    $ cpan `mymeta-requires`
 
 Likewise, much of the documentation Pod is generated at release time.
 Depending on the distribution, some documentation may be written in a Pod
@@ -37,14 +37,14 @@ author-specific plugins.  If you would like to use it for contributing,
 install it from CPAN, then run one of the following commands, depending on
 your CPAN client:
 
-  $ cpan `dzil authordeps`
-  $ dzil authordeps | cpanm
+    $ cpan `dzil authordeps`
+    $ dzil authordeps | cpanm
 
 Once installed, here are some dzil commands you might try:
 
-  $ dzil build
-  $ dzil test
-  $ dzil xtest
+    $ dzil build
+    $ dzil test
+    $ dzil xtest
 
 You can learn more about Dist::Zilla at http://dzil.org/
 
