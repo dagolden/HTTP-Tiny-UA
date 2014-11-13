@@ -14,7 +14,7 @@ BEGIN { monkey_patch() }
 
 my $UA_CLASS = "HTTP::Tiny::UA";
 
-for my $file ( dir_list( "t/cases", qr/^get/ ) ) {
+for my $file ( dir_list( "corpus", qr/^get/ ) ) {
     my $label = basename($file);
     my $data = do { local ( @ARGV, $/ ) = $file; <> };
     my ( $params, $expect_req, $give_res ) = split /--+\n/, $data;

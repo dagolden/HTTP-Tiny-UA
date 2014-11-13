@@ -1,10 +1,10 @@
-use v5.10;
 use strict;
 use warnings;
 
 package HTTP::Tiny::UA::Response;
 # ABSTRACT: Wrap HTTP::Tiny response as objects with accessors
-# VERSION
+
+our $VERSION = '0.003';
 
 use Class::Tiny qw( success url status reason content headers protocol );
 

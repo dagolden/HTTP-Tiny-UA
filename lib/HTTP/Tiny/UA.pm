@@ -1,10 +1,10 @@
-use v5.10;
 use strict;
 use warnings;
 
 package HTTP::Tiny::UA;
 # ABSTRACT: Higher-level UA features for HTTP::Tiny
-# VERSION
+
+our $VERSION = '0.003';
 
 use superclass 'HTTP::Tiny' => 0.036;
 
