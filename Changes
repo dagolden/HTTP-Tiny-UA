@@ -2,6 +2,8 @@ Revision history for HTTP-Tiny-UA
 
 {{$NEXT}}
 
+0.003     2014-11-13 16:32:41-05:00 America/New_York
+
     [CHANGED]
 
     - Drop perl prereq from v5.10 to v5.6

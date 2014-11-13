@@ -4,7 +4,7 @@ use warnings;
 package HTTP::Tiny::UA::Response;
 # ABSTRACT: Wrap HTTP::Tiny response as objects with accessors
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Class::Tiny qw( success url status reason content headers protocol );
 
