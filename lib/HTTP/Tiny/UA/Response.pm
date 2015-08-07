@@ -6,7 +6,7 @@ package HTTP::Tiny::UA::Response;
 
 our $VERSION = '0.004';
 
-use Class::Tiny qw( success url status reason content headers protocol );
+use Class::Tiny qw( success url status reason content protocol );
 
 =attr success
 
@@ -32,9 +32,32 @@ Otherwise it will be a scalar value.
 
 =cut
 
+#Don't return the original hash reference because the caller could
+#alter that referred-to hash, which in turn would alter this object's
+#internals, which we almost certainly do not want!
+sub headers {
+    my ($self) = @_;
+
+    return { map { $_ => $self->header($_) } keys %{ $self->{'headers'} } };
+}
+
 sub header {
     my ( $self, $field ) = @_;
-    return $self->headers->{ lc $field };
+
+    #NB: lc() can potentially use non-English (e.g., Turkish)
+    #lowercasing logic, which we very likely do not want here.
+    $field =~ tr/A-Z/a-z/;
+
+    my $hdr = $self->headers->{$field};
+
+    #We don't return the original array reference for the same reason
+    #why headers() doesn't return the original hash reference.
+    if ( 'ARRAY' eq ref $hdr ) {
+        return [@$hdr];
+    }
+
+    #...but in the general case, we just want to return a scalar value.
+    return $hdr;
 }
 
 1;
