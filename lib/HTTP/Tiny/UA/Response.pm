@@ -4,7 +4,7 @@ use warnings;
 package HTTP::Tiny::UA::Response;
 # ABSTRACT: Wrap HTTP::Tiny response as objects with accessors
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 # Declare custom accessor before Class::Tiny loads
 use subs 'headers';

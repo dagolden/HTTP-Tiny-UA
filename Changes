@@ -2,6 +2,8 @@ Revision history for HTTP-Tiny-UA
 
 {{$NEXT}}
 
+0.004     2015-08-12 10:22:46-04:00 America/New_York
+
     [CHANGED]
 
     - Copies response headers in header accessors to ensure original is
