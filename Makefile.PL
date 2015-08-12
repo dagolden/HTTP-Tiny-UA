@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Class::Tiny" => 0,
     "HTTP::Tiny" => "0.036",
     "strict" => 0,
+    "subs" => 0,
     "superclass" => 0,
     "warnings" => 0
   },
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.88",
   "lib" => 0,
   "strict" => 0,
+  "subs" => 0,
   "superclass" => 0,
   "warnings" => 0
 );
