@@ -71,7 +71,7 @@ sub header {
 
 =head1 SYNOPSIS
 
-    my $res = HTTP::Tiny->new->get( $url );
+    my $res = HTTP::Tiny::UA->new->get( $url );
 
     if ( $res->success ) {
         say "Got " . $res->header("Content-Length") . " bytes";
