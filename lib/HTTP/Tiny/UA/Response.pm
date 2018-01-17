@@ -9,7 +9,7 @@ our $VERSION = '0.005';
 # Declare custom accessor before Class::Tiny loads
 use subs 'headers';
 
-use Class::Tiny qw( success url status reason content protocol headers );
+use Class::Tiny 1.000 qw( success url status reason content protocol headers );
 
 =attr success
 

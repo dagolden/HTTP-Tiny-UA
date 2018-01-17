@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "HTTP::Tiny::UA",
   "PREREQ_PM" => {
-    "Class::Tiny" => 0,
+    "Class::Tiny" => "1.000",
     "HTTP::Tiny" => "0.036",
     "strict" => 0,
     "subs" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Class::Tiny" => 0,
+  "Class::Tiny" => "1.000",
   "Data::Dumper" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
