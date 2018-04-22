@@ -4,7 +4,7 @@ use warnings;
 package HTTP::Tiny::UA;
 # ABSTRACT: Higher-level UA features for HTTP::Tiny
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use superclass 'HTTP::Tiny' => 0.036;
 
